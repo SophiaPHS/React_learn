@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>列表渲染</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <!-- Don't use this in production: -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+    <button id="btn">重新渲染页面</button>
+    <div id="root"></div>
+    <script type="text/babel">
+        /* 
+            JSX中渲染列表时，需设置一个唯一key，否则Warning: Each child in a list should have a unique "key" prop.        
+                原因：重新渲染页面时，React按照顺序依次比较对应元素，当渲染列表不指定key，在列表前加一个元素，其他元素不变，其列表位置发生变化，使得整个列表都会重新修改渲染(性能差)
+            问题解决：为列表设计key属性，相当于id，再比较元素时依据相同key比较而非顺序比较
+            - 注意:这个key在当前列表唯一即可，且不显示在页面中，是react对象中的属性
+                   一般用id作为key，除非元素顺序不发生改变,否则不用index作为key(index会根据元素顺序改变而改变)
+        */
+        const arr =['孙悟空','猪八戒','沙和尚']
+        let list =<ul>{arr}</ul> //jsx会将数组中所有元素显示在页面中，但是渲染为：孙悟空猪八戒沙和尚
+        // 想让数组元素以列表形式展示，有如下方法：
+        // 方法1，for循环遍历数组并拼接<li>标签
+        const data = []
+        for(let i=0;i<arr.length;i++){
+            data.push(<li key={arr[i]}>{arr[i]}</li>)
+        }
+        list = <ul>{data}</ul>
+        // 方法2：通过map实现(原数组->新数组) {item}一定要{}表示参数(表达式)
+        const newArr=arr.map(item=><li key={item}>{item}</li>)
+        list = <ul>{newArr}</ul>
+        // 等价于
+        list =<ul>{arr.map(item=><li key={item}>{item}</li>)}</ul>
+        const root = ReactDOM.createRoot(document.getElementById('root'))
+        root.render(list)
+        document.getElementById('btn').onclick=function(){
+            // 重新渲染页面
+            const arr =['唐僧','孙悟空','猪八戒','沙和尚']
+            const list =<ul>{arr.map(item=><li key={item}>{item}</li>)}</ul>
+            root.render(list)
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSX</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <!-- Don't use this in production: -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+    <div id="root"></div>
+    <!-- 设置js代码被babel处理 -->
+    <script type="text/babel">
+        /*  JSX：JavaScript的语法扩展，类似于HTML的形式去使用JS，是React中声明式编程的体现方式
+                -JSX原理：React.createElement()的语法糖
+                -babel使用：因浏览器不能识别JSX，所以在浏览器中直接使用JSX时(React中使用JSX也是如此)，必须引入babel将JSX翻译成JS
+                -JSX使用：引入babel，并设置 <script type="text/babel">
+                -注意事项
+                    1.JSX不是字符串，不用加引号
+                    2.JSX中有且只有一个根标签
+                    3.JSX中html标签小写，React组件大写开头
+                    4.可以使用{}嵌入表达式（表达式：有值(返回值)的语句，(if,for不是表达式，但可以在这些语句中操作JSX)）
+                    5.标签属性与html写法一致(class使用className,style必须用{}对象设置)
+                        - style={{backgroundColor:'yellow'}}:外层{}表示表达式，里层{}表示对象,属性若是-连接，需删除-且以小驼峰命名属性名
+                        - 点击事件以小驼峰命名，回调函数用{}包裹
+                    6.标签必须正常闭合(自结束标签必须写'/')
+                    7.若表达式为布尔类型、null和undefined等不会在页面中显示
+        */
+        // 命令式编程
+        // const button = React.createElement('button',{},'我是按钮')
+
+        // 声明式编程(结果导向)，在React中可以通过JSX(JS扩展)来创建React元素,JSX需要被翻译为JS代码，才能被React执行
+        const div =<div className='div'>
+            我是一个div
+            {1+1}
+            <button onClick={()=>{alert('点击事件')}} style={{backgroundColor:'yellow'}}>我是按钮</button>
+            {undefined}
+        </div>   
+        const root = ReactDOM.createRoot(document.getElementById('root'))
+        root.render(div)
+
+        // 语句中操作JSX
+        let button
+        const lang = 'cn'
+        if(lang === 'cn'){
+            button=<button>按钮</button>
+        }else{
+            button=<button>button</button>
+        }
+        // root.render(button)
+    </script>
+</body>
+</html>

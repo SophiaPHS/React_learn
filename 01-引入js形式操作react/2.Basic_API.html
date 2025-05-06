@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Basic_API</title>
+    <!-- 引入react核心库 -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <!-- 引入react的DOM库 -->
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+</head>
+<body>
+    <button id="btn">我是按钮</button>
+    <div id="root">
+        <button>react元素会替换此标签</button>
+    </div>
+    <script>
+        /* 
+            1.React.createElement()
+                - 用来创建一个React元素
+                - 参数：
+                    1.元素名(html标签必须小写开头，大写开头会认为组件)
+                    2.元素(标签)中的属性,比如id:btn
+                        - 在设置事件时，属性名为小驼峰式，且属性值为函数，不能直接写alert('xxx')
+                        - 对于class设置，由于class和定义类class冲突，所以用className代替标签中的class属性
+                    3.元素的内容(子元素)--可以有多个
+                - ps:
+                    对于网页，react元素会通过虚拟dom转换为真实的dom元素
+                    react元素一旦创建，无法修改，只能通过新创建元素进行替换(简化原生DOM的修改操作)
+
+            2.ReactDOM.createRoot()
+                - 创建根元素root，参数为dom元素(作为根元素)，用于插入react元素，一般就一个根元素
+            3.root.render()
+                - 用来将react元素渲染到根元素中
+                - 根元素中所有内容都会被react元素替换
+                - 当重复调用render()时，react会将两次渲染结果进行比较，并更新只变化的元素(diff算法)，减少对dom操作
+            
+            操作原理：通过虚拟DOM将React元素和原生DOM进行映射，虽然操作的是React元素，但这些操作最终会体现在真实DOM中
+            虚拟DOM优点：降低API(原生DOM)复杂度
+                        解决兼容问题(不同浏览器及其版本对原生DOM操作的语法支持不一样)
+                        提升性能(减少DOM的不必要操作)
+        
+        */
+        // 这里是创建React元素，而非dom元素，所以用react核心库操作而非react-dom库
+        const button = React.createElement('button',{
+            type:'button',
+            className:'button',
+            onClick:()=>{alert('事件绑定')     
+            }},'点我')
+        const div = React.createElement('div',{},'div内容',button)
+        // 获取根元素 dom元素->react元素
+        const root = ReactDOM.createRoot(document.getElementById('root'))
+        // 将button在根元素中显示
+        root.render(div)
+        
+        
+        // 获取按钮对象并绑定事件
+        const btn = document.getElementById('btn')
+        btn.addEventListener('click',()=>{
+            // 点击按钮，修改div中button的内容
+            const button = React.createElement('button',{
+            type:'button',
+            className:'button',
+            onClick:()=>{alert('事件绑定')     
+            }},'click me')
+            
+
+            // 修改react元素，重新对根元素进行渲染--不是追加，会覆盖原有的div
+            // root.render(button)
+            // 创建一个div，使div内容和子元素都进行渲染
+            const div = React.createElement('div',{},'div内容',button)
+            // 当调用render渲染页面时，React会自动比较两次渲染的元素，只在真实DOM中更新发生变化的部分
+            root.render(div)
+        })
+
+    </script>
+</body>
+</html>
