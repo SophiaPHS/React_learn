@@ -1,0 +1,69 @@
+/* 设置基本样式 */
+*{
+    /* 设置的边框和内边距的值是包含在 width 内的 */
+    box-sizing: border-box;
+}
+/* 设置body样式 */
+body{
+    background-color: #DFDFDF;
+    margin: 0;/* 去除body外边距 */
+}
+/* 设置外层容器logs样式 */
+.logs{
+    width: 800px;
+    background-color: #EAE287;
+    margin: 50px auto;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px  rgb(0, 0, 0,.2);
+}
+/* 设置item的样式 */
+.item{
+    /* 开启弹性盒 */
+    display: flex;
+    margin: 16px 0;
+    padding: 6px;
+    background-color: #FCBF49;
+    border-radius: 10px;
+    box-shadow: 0 0 10px  rgb(0, 0, 0,.2);
+}
+/* 设置date日期样式 */
+.date{
+    width: 90px;
+    background-color: white;
+    border-radius: 10px;
+    font-weight: bold;
+    text-align: center;
+    overflow: hidden; /*实现子边框圆角不会被覆盖???*/
+}
+/* 设置月份效果 */
+.month{
+    height: 30px;
+    line-height: 30px;
+    font-size: 20px;
+    color: #fff;
+    background-color: #D62828;
+
+}
+/* 设置日期效果 */
+.day{
+    height: 60px;
+    line-height: 60px;
+    font-size: 50px;
+}
+/* 设置日志内容样式 */
+.content{
+    flex: auto;/*自动占满父容器右边空的位置???*/
+    text-align: center;
+    font-weight: bold;
+
+}
+/* 设置描述内容 */
+.desc{
+    font-size: 16px;
+    color: #194B49;
+}
+/* 设置学习时间 */
+.time{
+    color: #D62828;
+}

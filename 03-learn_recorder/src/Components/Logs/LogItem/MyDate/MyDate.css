@@ -1,0 +1,25 @@
+/* 设置date日期样式 */
+.date{
+    width: 90px;
+    background-color: white;
+    border-radius: 10px;
+    font-weight: bold;
+    text-align: center;
+    /* 当父容器设置 border-radius 但子元素溢出时，子元素的边角可能突破父容器圆角，导致圆角失效。 */
+    overflow: hidden; /*确保子元素不突破父容器圆角边界 */
+}
+/* 设置月份效果 */
+.month{
+    height: 30px;
+    line-height: 30px;
+    font-size: 20px;
+    color: #fff;
+    background-color: #D62828;
+
+}
+/* 设置日期效果 */
+.day{
+    height: 60px;
+    line-height: 60px;
+    font-size: 50px;
+}
