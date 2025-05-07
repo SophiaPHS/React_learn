@@ -98,3 +98,6 @@ package.json中写入如下代码：
 - 当组件过多时，在src文件下难以管理，所以除了`App.js,index.js`文件,其余组件放入`src/Components`中，
 - 相关组件还可在Components创建一个文件进行存放，以此类推进而方便管理组件相关css文件和js文件放一块，且文件同名
 
+
+
+fs
