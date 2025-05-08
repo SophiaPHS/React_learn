@@ -58,13 +58,6 @@ package.json中写入如下代码：
     ]
 }
 ```
-
-# 样式编写
-- 直接写在index.html
-    不建议使用，这个是对应全局的，且和js分隔开，若样式太多不便于维护管理
-- 在src创建css文件，且和相应js文件名一致(index.css)
-    写完样式需在对应js文件引入：`import './index.css'`  ---引入样式需以`./`开头
-
 # React组件
  - 定义组件：
     - 基于函数的组件(推荐)：返回一个JSX的函数；组件首字母必须大写
@@ -94,6 +87,201 @@ package.json中写入如下代码：
          )
         ```
 
+# 样式编写
+- 直接写在index.html
+    不建议使用，这个是对应全局的，且和js分隔开，若样式太多不便于维护管理
+- 在src创建css文件，且和相应js文件名一致(index.css)
+    写完样式需在对应js文件引入：`import './index.css'`  ---引入样式需以`./`开头
+- 写在组件内,以App.js为例
+```js
+const App = () => {
+  return (
+        <div
+            style={{width:200,height:200,margin:'100px auto',backgroundColor:'#bfa'}}
+        >
+        </div>
+    )
+}
+```
+> 如果数字可直接写，如果是字符串比如200px、#bfa或者属性值有多个用引号包裹
+
+
 # 组件管理
 - 当组件过多时，在src文件下难以管理，所以除了`App.js,index.js`文件,其余组件放入`src/Components`中，
 - 相关组件还可在Components创建一个文件进行存放，以此类推进而方便管理组件相关css文件和js文件放一块，且文件同名
+
+# 原生事件 vs react事件
+原生事件的三种写法
+```html
+<!-- 写法1 -->
+<button id='btn' onclick = 'alert(123)'>点我一下</button>
+<!-- 写法2 DOM0级-->
+document.getElementById('btn').onclick=function(){};
+<!-- 写法3 DOM2级 事件名，回调函数，指定事件是否在捕获或冒泡阶段执行，true为捕获阶段，false为冒泡阶段(默认值) -->
+ document.getElementById('btn').addEventListener('click',function(){},false)
+```
+> 写法2和写法3的区别：前者不能向元素绑定多个事件，若绑定多个后定义事件会覆盖前面定义的事件；后者可以为元素添加多个事件处理程序，且会按照添加顺序依次调用，也可删除指定事件(removeEventListener不能移除匿名添加的函数)
+
+react事件通过元素属性添加，写法2和3是直接操作真实dom，脱离react管理，故不建议使用
+```js
+/* 注意：事件属性名需要使用小驼峰命名；onclick -> onClick
+        属性值不能直接执行代码，需要回调函数  onclick = 'alert(123)'->onclick={{}=>{alert(123)}}
+*/
+// 优化写法
+const clickHandler = ()=>{alert(123)}
+// 注意这里是clickHandler即事件触发调用，如果是clickHandler()初始化时就调用了，一般情况不写`()`
+<button onClick={clickHandler}>点我一下</button>
+```
+```js
+/* 
+    事件对象：
+        - react事件中同样会传递事件对象，可以在响应函数中定义参数来接收事件对象
+        - react中事件对象不是原生事件对象，是经过react包装后的事件对象
+        - 由于对象进行包装，所以使用过程中不需要考虑兼容性问题
+    事件默认行为：
+        - 原生事件中return false 可以取消默认行为，比如链接跳转
+        - react中，return false 不可以取消默认行为，但可通过event.preventDefault()取消默认行为
+    冒泡：react使用event.stopPropagation()取消事件冒泡
+    
+*/
+const clickHandler = (event)=>{
+    alert(123)
+    event.preventDefault() //取消默认行为
+    event.stopPropagation()//取消事件冒泡
+    // return false 
+}
+<button onClick={clickHandler}>点我一下</button>
+<a href='...' onClick={clickHandler}>链接</a>
+```
+## DOM事件流
+1. 事件捕获阶段(外层元素->目标元素传播)
+2. 处于目标阶段(触发目标元素自身的事件)
+3. 事件冒泡阶段(目标元素->外层元素传播)
+> - DOM0级默认使用事件冒泡，DOM2级默认使用事件冒泡
+> - 事件捕获优于事件冒泡
+```html
+<div class="grandma">
+    grandma奶奶
+    <div class="mother">
+        mother妈妈
+        <div class="daughter">
+            daughter女儿
+            <div class="baby">
+                baby婴儿
+            </div>
+        </div>
+    </div>
+</div>
+```
+```js
+var grandma = document.getElementById('grandma')[0]
+var mother = document.getElementById('mother')[0]
+var daughter = document.getElementById('daughter')[0]
+var baby= document.getElementById('baby')[0]
+function theName(){
+    console.log('我是'+this.className)
+}
+grandma.onclick=theName //冒泡
+mother.addEventListerner('click',theName,true)//捕获 
+daughter.addEventListerner('click',theName,true)//捕获
+baby.addEventListerner('click',theName,false)//冒泡
+```
+点击baby执行顺序：
+
+1. 捕获阶段(从外到内):
+- 外层元素检查是否有捕获阶段的事件
+
+    - mother有捕获事件 →执行mother
+
+    - daughter有捕获事件 →执行daughter
+2. 目标阶段
+- baby自身事件在冒泡阶段触发 →执行baby
+
+3. 冒泡阶段(从内到外)
+- 外层元素检查是否有冒泡阶段的事件
+    - grandma有冒泡事件 →执行grandma
+
+
+# React之props传参
+父组件通过props属性向子组件传递数据(数据可以是函数，对象，数组，字符串，数字等)
+```js
+const parent =()=>{
+    return (
+        <div>
+            <Child date={new Date()} name={"张三"} fn={()=>{}}/>
+            <Child date={new Date(2021,5,22,5,30,0)} name={"李四"} fn={()=>{}}/>
+        </div>
+    )
+}
+```
+> 在函数组件中，属性就相当于函数的参数,可在函数组件的形参定义一个`props`,指向的是一个对象，包含父组件传递的所有参数
+```js
+const child =(props)=>{
+    console.log(props) {/* {data:..,name:'张三'，fn：f} */}
+    return (
+        <div>
+            子组件,我的名字是{props.name}
+            <GrandChild date={props.date}/>
+        </div>
+    )
+}
+const GrandChild =(props)=>{
+    console.log(props) {/* {data:..} */}
+    return (
+        <div>
+            孙组件，当前时间为{props.date}
+        </div>
+    )
+}
+```
+>`注意`： 
+> - props可以实现父->子->孙传递数据
+> - props只读不能修改，子组件`props.name='王五'`报错
+## 组件优化
+对于重复组件参入较多参数，在JSX中比较臃肿，可通过map简化
+```js
+// 直接组件传值
+const Logs = ()=>{
+    return <div className="logs">
+        <LogItem date={new Date()} desc={"学习Vue"} time={"50"}/>
+        <LogItem date={new Date(2022,11,1,21,30,0)} desc={"学习React"} time={"30"}/>
+        <LogItem date={new Date(2021,5,22,5,30,0)} desc={"学习JS"} time={"40"}/>
+    </div>
+}
+// 优化1：将传入数据提取到JSX外
+const Logs = ()=>{
+    const logsData = [
+        {
+            id:'001',
+            date:new Date(),
+            desc:'学习React',
+            time:50
+        },
+        {
+            id:'002',
+            date:new Date(2022,11,1,21,30,0),
+            desc:'学习Vue',
+            time:30
+        },
+        {
+            id:'003',
+            date:new Date(2021,5,22,5,30,0),
+            desc:'学习JS',
+            time:40
+        }
+    ]
+    return <div className="logs">
+        {
+            logsData.map(item => <LogItem key={item.id} date={item.date} desc={item.desc} time={item.time} />)
+        }   
+    </div>
+}
+// 优化2：虽然map函数简化了JSX，但JSX中还是有数据操作，可以将相应操作再次提出，使得JSX只显示数据
+const logItemDate = logsData.map(item => <LogItem key={item.id} date={item.date} desc={item.desc} time={item.time}/>) 
+return <div className="logs">
+        {logItemDate} 
+    </div>
+```
+> 如果属性和数组中对象属性名一致，可以简写为`{...item}` === `date={item.date} desc={item.desc} time={item.time}`
+
+
