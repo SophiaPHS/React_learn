@@ -3,6 +3,7 @@
     /* 设置的边框和内边距的值是包含在 width 内的 */
     box-sizing: border-box;
 }
+
 /* 设置body样式 */
 body{
     background-color: #DFDFDF;

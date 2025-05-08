@@ -31,6 +31,7 @@ npx react-scripts start # 通过webpack启动内置测试服务器，根据修�
     - js
     - asset-mainfest.json
     - index.html
+      
 ## 命令执行优化
 在package.json中添加scripts配置(运行脚本命令)
 ```json
