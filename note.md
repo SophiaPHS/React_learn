@@ -235,6 +235,8 @@ const GrandChild =(props)=>{
     )
 }
 ```
+- 类组件使用`props`
+    - 类组件的props是存储到类的实例对象中，直接通过实例对象访问(`this.props`)
 >`注意`： 
 > - props可以实现父->子->孙传递数据
 > - props只读不能修改，子组件`props.name='王五'`报错
@@ -284,29 +286,106 @@ return <div className="logs">
     </div>
 ```
 > 如果属性和数组中对象属性名一致，可以简写为`{...item}` === `date={item.date} desc={item.desc} time={item.time}`
+## props.children 
+- 含义：组件标签体
+- 用法：
+```js
+// 父组件
+cosnt Parent = ()=>{
+    return {
+        <Child className="parent">
+            <h1>父组件内容</h1>
+        </Child>
+}
+// 子组件
+cosnt Child = ()=>{
+    return {
+        <div className=`child ${props.className}`>
+            {props.children} {/**<h1>父组件内容</h1> */}
+        </div>
+}
+```
+> 通过模板字符串设置多个className,每个className空格隔开，变量用`${}`接收
 
 # React之State状态
 `state`和`props`类似，都是一种存储属性的方式，但state只属于当前组件，其他组件无法访问，且`state`可变，当其发生变化后相关组件会重新渲染
+- 本质：是一个被React创建并管理的变量
+    - 通过useState()声明(import { useState } from 'react')
+    - 通过`setState()`修改变量的值时，会触发组件的重新渲染(触发render()，前提是state值变化)
+- 原理:当调用useState()时，React会在组件内部创建一个特殊的存储空间来保存这个state
+    - React 会监控 state 的变化，并在 state 更新时自动触发组件的重新渲染
+    - useState()：参数---state初始值<br/>
+                     返回值---数组：<br/>
+                     1--初始值(直接修改不会触发组件的重新渲染)<br/>
+                     2--函数setState()，修改state
+    - 注意事项：
+        - 当state的值是一个对象时： 
+            - 如果直接setState({...}):覆盖原有对象，触发组件重新渲染
+            - 若需改对象中的某个属性，`user.name = '李四';setUser(user)`，对象地址不变，不会触发组件重新渲染
+            - 重新创建一个对象并修改某一属性，会触发组件重新渲染
+                - 方法1：const newUser = Object.assign({}，user);<br/>
+                        newUser.name='王五'<br/>
+                        setUser(newUser)
+                - 方法2：setUser({...user,name:'王五'})
+        - `当通过setState去修改一个state时，并不表示修改当前的state,修改的是组件下一次渲染时state值`
+        - setState()会触发组件的重新渲染，它是异步的(比如设置多个setState()--仅渲染最后一次的修改)
+            - 所以当调用setState()需要用旧state的值时，可能出现计算错误的情况(通过向setState()传递回调函数的形式来修改state)
+- 函数组件使用`State`
+```js
+const [count,useCount] = useState(0)
+const [user,setUser]=useState({name:'张三',age:18})
+const changeState = ()=>{
+    setTimeout(()=>{
+      //  return setCount(count+1) 用旧state的值时,连续多次修改count可能不是最新值
+      setCount((prevCount)=>{
+          return prevCount+1
+      })
+    },1000)
+    setUser({...user,name:'王五'})
+}
 ```
-    State
-        -本质：是一个被React创建并管理的变量,通过useState()声明(import { useState } from 'react')
-            通过`setState()`修改变量的值时，会触发组件的重新渲染(触发render()，前提是state值变化)
-        - 原理:当调用useState()时，React会在组件内部创建一个特殊的存储空间来保存这个state
-                 React 会监控 state 的变化，并在 state 更新时自动触发组件的重新渲染
-        - useState():参数---state初始值
-                     返回值---数组：1--初始值(直接修改不会触发组件的重新渲染)
-                                   2--函数setState()，修改state
-        -注意事项：
-            - 当state的值是一个对象时： 
-                - 如果直接setState({...}):覆盖原有对象，触发组件重新渲染
-                - 若需改对象中的某个属性，`user.name = '李四';setUser(user)`，对象地址不变，不会触发组件重新渲染
-                - 重新创建一个对象并修改某一属性，会触发组件重新渲染
-                    方法1：const newUser = Object.assign({},user)
-                           newUser.name='王五'
-                           setUser(newUser)
-                    方法2：setUser({...user,name:'王五'})
-            - 【当通过setState去修改一个state时，并不表示修改当前的state,修改的是组件下一次渲染时state值】
-            - setState()会触发组件的重新渲染，它是异步的(比如设置多个setState()--仅渲染最后一次的修改)
-                所以当调用setState()需要用旧state的值时，可能出现计算错误的情况--通过向setState()传递回调函数的形式来修改state
+- 类组件使用`State`
+    - state统一存储到实例对象的state属性中
+        - this.state访问属性
+        - this.setState()修改属性：对于直接定义在state中属性不修改会保留，嵌套属性修改是整个替换
+```js
+// 存储该组件的所有state值
+state = {
+    title:类组件
+    count:0,
+    obj:{name:'王五',age:18}
+}
+changeState = ()=>{
+    this.setState(prevState=>{
+        return {
+            count:prevState.count+1 //title和obj没修改会保留
+        }
+    })
+    this.setState({
+        // obj:{name:'李四'}替换原先obj，会丢失age
+        obj:{...this.state.obj,name:'李四'} // 创建一个含有name,age属性的对象并替换name的值
+    })
+}
+<button onClick={changeState}>修改state</button>
 ```
+> 函数组件  VS 类组件使用state
+> - 二者在定义和使用state时方法有偏差，但原理一致
+> - 函数组件中，响应函数直接以函数的形式定义在组件中(有const)，使用时要加前缀`this`
+> - 类组件中，响应函数式是类的方法定义(无const)
+
+# React之Ref(获取原生DOM对象)
+函数组件
+- 使用步骤：
+    1. 通过`useRef()`创建一个存储DOM的容器  `const buttonRef = useRef()`
+    2. 将容器设置为想要获取DOM对象元素的ref属性 `<button ref={buttonRef}>按钮</button>`
+    3. 通过`buttonRefRef.current.innerText`修改标签中的内容
+- 原理：
+    1. 步骤2实现React自动将当前元素的DOM对象，设置为容器的current属性，`组件重新渲染获取到的都是同一个对象`
+    2. 类似于直接创建含有current属性的对象并绑定到想要获取DOM对象元素的ref属性上，`组件重新渲染都会创建一个新对象`
+- `useRef()(钩子函数)`注意事项：React中的钩子函数只能用于函数组件或自定义钩子，不能在函数组件内嵌套的函数中调用
+
+类组件
+- 类组件通过`React.createRef()`创建容器,并通过`{this.buttonRef}`设置ref属性，其他操作和函数组件一致
+
+>`注意`： 不建议获取原生DOM对象进行操作，这样会脱离React控制，因为我们是操作React元素，虚拟DOM会将其映射为真实DOM
 
