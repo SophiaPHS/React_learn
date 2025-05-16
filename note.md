@@ -327,7 +327,8 @@ cosnt Child = ()=>{
                         newUser.name='王五'<br/>
                         setUser(newUser)
                 - 方法2：setUser({...user,name:'王五'})
-        - `当通过setState去修改一个state时，并不表示修改当前的state,修改的是组件下一次渲染时state值`
+        - `当通过setState去修改一个state时，并不表示修改当前的state,修改的是组件下一次渲染时state值` <br/>
+            即`const newCount=setCount(count+1) console.log(count===newCount)`结果为false
         - setState()会触发组件的重新渲染，它是异步的(比如设置多个setState()--仅渲染最后一次的修改)
             - 所以当调用setState()需要用旧state的值时，可能出现计算错误的情况(通过向setState()传递回调函数的形式来修改state)
 - 函数组件使用`State`
@@ -388,4 +389,232 @@ changeState = ()=>{
 - 类组件通过`React.createRef()`创建容器,并通过`{this.buttonRef}`设置ref属性，其他操作和函数组件一致
 
 >`注意`： 不建议获取原生DOM对象进行操作，这样会脱离React控制，因为我们是操作React元素，虚拟DOM会将其映射为真实DOM
+
+# 03-learn_recorder/src 12-日志添加删除过滤
+## 公共样式的组件创建
+在设计组件时，多个组件可能存在相同样式，如果单独创建css文件，当修改其公共样式时需要修改多个css文件，所以将公共样式提取出来并创建一个组件，便于后期修改维护
+```js
+// Common.js--放置了公共样式组件(子组件)
+import './Common.css'
+const Common = (props) => {
+  return (
+    <div className={`common ${props.className}`}>
+        {props.children}
+    </div>
+  )
+}
+// Other.js---需要用到公共样式(父组件)
+const Other = (props) => {
+  return (
+    <Commond className="other">
+        <div>涵盖自身样式和公共样式</div>
+    </Common>
+  )
+}
+// 上述写法及功能类似于vue的插槽
+```
+> - `props.className`,从Other组件传递过来的className
+> - 当标签属性涉及到字符串和变量/表达式的混合使用时，可以用模板字符串，即`${}`插入变量/表达式，字符串无需引号括起来，且二者需用空格隔开
+> - `props.children`获得组件标签体，这里是`<div>涵盖自身样式和公共样式</div>`
+
+## 表单组件添加(这里以input为例)
+
+- 当表单项发生变化时，可通过event.target.value获取用户输入内容,即【表单数据获取】
+    - event:事件对象中保存了当前事件触发的所有信息
+    - event.target:指向触发事件的对象(DDM对象)
+    - 具体操作： 
+        1. 给`<input/>`标签绑定`onChange`事件,变量为一个`响应函数`
+        2. 创建一个响应函数，用于监听input输入框内容的变化
+    
+            ```js
+            const dateChangeHandler=(e)=>{
+                console.log(e.target.value)//获取了输入框的内容
+            } 
+            ```
+- 表单数据存储
+    - 方法1：通过`let`创建变量进行存储(不推荐)，因为在 React 中，`普通变量的修改不会触发组件的重新渲染`，因此输入框无响应,即它是一个不受控组件
+
+        ```js
+        const Form = ()=> {
+            let age = '';
+            const inputChange =(e)=>{
+                age = e.target.value
+            }
+            return (
+                <form>
+                    <input value={age} onChange={inputChange} /> {/* 这里不会有任何响应性 */}
+                </form>
+            );
+        }
+        ```
+    - 方法2：通过`state`存储数据。React开发表单时，其表单数据一般存放至state中，同时表单`value绑定state中数据`，实现`state和表单双向绑定`---【受控组件】
+        - 每个数据`单独设置useState`,`弊端`：当表单数据过多，要设置多个useState
+       
+            ```js
+            const Form = ()=> {
+                const [inputName,setInputName]=useState('')
+                const [inputAge,setInputAge]=useState('')
+                //创建响应函数，监听输入框内容变化
+                const nameChange =(e)=>{
+                    setInputName(e.target.value)
+                }
+                const ageChange =(e)=>{
+                    setInputAge(e.target.value)
+                }
+                return (
+                    <form>
+                        姓名：<input value={inputName} onChange={nameChange} /><br/> 
+                        年龄：<input value={inputAge} onChange={ageChange} /> 
+                    </form>
+                );
+            }
+            ```
+        - 所有数据`用一个state进行存储`,`弊端`：每次访问里面数据要前缀`formData`，并且修改其中某一数据，需要`浅复制`，不然会覆盖原先数据
+
+            ```js
+            const Form = ()=> {
+                const [formData,setFormData]=useState({
+                    inputName:'',
+                    inputAge:''
+                })
+                const nameChange =(e)=>{
+                    setFormData({
+                        ...formData,
+                        inputName:e.target.value
+                    })
+                }
+                const ageChange =(e)=>{
+                    setFormData({
+                        ...formData,
+                        inputAge:e.target.value
+                    })
+                }
+                return (
+                    <form>
+                        姓名：<input value={formData.inputName} onChange={nameChange} /><br/> 
+                        年龄：<input value={formData.inputAge} onChange={ageChange} /> 
+                    </form>
+                );
+            }
+            ```
+- 提交表单并处理数据(以单独创建useState存储数据为例)
+    ```js
+    const Form = ()=> {
+        const [inputName,setInputName]=useState('')
+        const [inputAge,setInputAge]=useState('')
+        const nameChange =(e)=>{
+            setInputName(e.target.value)
+        }
+        const ageChange =(e)=>{
+            setInputAge(e.target.value)
+        }
+        const formSubmitHandler = (e)=>{
+            // 取消表单默认行为，提交时页面跳转
+            e.preventDefault();
+            // 获取表单项中的数据整合至一个对象中
+            const newLog = {
+                name:inputName
+                age:+inputAge // `+`实现非数字类型转换成number类型(隐式转换)
+            }
+            //  清空表单项  
+            setInputName('')
+            setInputAge('')
+            /*一个state统一管理数据的清空示例：
+            setFormData({
+                inputName:'',
+                inputAge:'',
+            }) */
+        }
+        return (
+            <form  onSubmit={formSubmitHandler}>
+                <label htmlFor='name'>姓名</label>
+                <input value={inputName} onChange={nameChange} /><br/> 
+                <label htmlFor='age'>年龄</label>
+                <input value={inputAge} onChange={ageChange} /> <br/> 
+                <button>添加</button>
+            </form>
+        );
+    }
+    ```
+    > `拓展`:
+    > - 表单中button没有设置type，默认`type="submit"`，被视为触发表单提交的按钮,`点击按钮会触发form的onSubmit事件`
+    > - `label标签`:在React`htmlFor属性`和在HTML`for属性`用法一致，即将label标签与表单控件(如input)绑定,其值`需与目标元素的id完全匹配`，实现点击label时聚焦到input输入框
+    > - React中，通常表单不需要自行提交(即不出现跳转的情况)，而是通过React提交，所以通过`e.preventDefault()`取消默认行为(表单跳转)
+    > - 对于number类型数据，因input传入过来的是字符串，在其前面加`+`实现非数字类型转换成number类型(`隐式转换`)
+    > - 当表单提交时，输入框内容应为空，所以将存储相应数据的变量设置为空，因为input绑定了该变量，所以表单提交后也会渲染为空
+- input防抖节流
+
+## state提升
+- 内涵：在一个组件中存放的数据，需要被其他组件操作时，可以将数据放入到这些组件共同的祖先元素中(`最近的`)，实现多个组件均可访问这个数据
+- 以App.js存放state数据为例
+```js
+const App = ()=>{
+    // state提升
+    const [logsData,setLogsData] = useState([
+        {
+            id:'001',
+            date:new Date(),
+            desc:'学习React',
+            time:50
+        },
+        {
+            id:'002',
+            date:new Date(2022,11,1,21,30,0),
+            desc:'学习Vue',
+            time:30
+        },
+    ]) 
+    /* 
+        将LogsForm中的数据传递给App组件，然后App组件将新的日志添加到数组中
+            - 1.App给LogsForm传递一个回调函数
+            - 2.LogsForm添加日志时，调用该函数并将新的日志数据作为参数传递
+            - 3.App通过回调函数接收数据并可进行相应操作
+            - 此方法只适用于简单场景(父子组件，不涉及祖孙或多层嵌套组件)
+    */
+   const saveLogHandler = (newLog)=>{
+        // 向新的日志中添加id
+        newLog.id = Date.now()+''//设置为时间戳转字符串，但可能存在并发问题，即同一时刻创建了两个
+        // 将新的数据添加到数组中，newLog的顺序会影响其在数组中的位置，这里是末尾添加
+        setLogsData([newLog,...logsData])
+   }
+    return  <div className="app">
+                <LogsForm onSaveLog={saveLogHandler}/>
+                <Logs logsData={logsData}/>
+            </div>
+}
+```
+> `拓展`：
+> - 子组件向父组件传值(`子→父`)
+>  1. 父组件向子组件传递一个回调函数
+>  2. 子组件通过`props.函数名`调用该函数并将数据以参数形式传入
+>  3. 父组件在回调函数中接收参数，即可进行相应数据修改
+> - 向嵌套对象的数组传入对象，可通过解构赋值，示例:<br/> 
+      const person = [{name:'张三',gender:'男'}]<br/>
+      const age = {age:10}<br/>
+      const newPerson = [age,...person] --结果为 [{age:10,name:'张三',gender:'男'}]
+
+## 日志删除
+- splice删除数组元素使用,通过index删除
+- 祖孙数据传递props(App->LogItem)
+- 针对无日志的判断
+- window.confirm弹窗(不推荐，样式和位置不符合用户使用)-`用自定义Modal组件代替`
+- 遮罩层设置(出现弹窗，无法点击弹窗以外的元素)
+
+## Portal
+- 使用背景：在有些场景下`子组件直接渲染为父组件的后代，在网页显示时会出现一些问题`。比如，在LogItem组件中添加Bockdrop组件，
+           Bockdrop作为后代元素，在页面显示会把所有元素都覆盖(依赖定位)，若当前元素后边的兄弟元素中有开启定位的情况出现，
+           且层级不低于当前元素，便会出现盖住遮罩层的情况(`父组件position:relative,以及z-index层级`)
+- 作用：把组件渲染到网页中制定位置
+- 使用方法：1.在index.html添加一个新的元素
+           2.修改组件的渲染方式
+                - 通过`ReactDOM.createPortal()`作为返回值的创建元素  `import ReactDOM from 'react-dom'`
+                - 参数：
+                    - 1.jsx(传入目标位置的内容)
+                    - 2.目标位置(DOM元素)
+## 过滤日志
+- 功能：依据不同年份显示不同的学习日志
+- 注意：如果涉及删除日志，通过id删除；
+- 功能实现：设计LogFilter组件，一个下拉框选择年份，年份和Logs组件实现双向绑定;年份过滤在Logs中实现
+
+
 

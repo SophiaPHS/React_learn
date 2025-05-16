@@ -1,0 +1,43 @@
+.confirmModal{
+    display: flex;
+    flex-flow: column;
+    width: 400px;
+    height: 200px;
+    padding: 10px;
+    background-color: white;
+    position: absolute;
+    /* 让四个方向偏移量为0，在margin:auto实现居中 */
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+}
+.confirmText{
+    display: flex;
+    height: 150px;
+    /* line-height: 150px;如果文本有多行效果可能不是垂直居中
+        解决办法：文本用<p>标签包裹，同时样式设置flex布局，并设置水平垂直居中(justify-content,align-items)
+     */
+    justify-content: center;
+    align-items: center;
+    color: #D62828;
+    font-size: 22px;
+}
+.confirmButton{
+    flex: auto;
+    display: flex;
+    justify-content: flex-end;
+}
+.confirmButton button{
+    width: 88px;
+    margin: 0 10px;
+    border: none;
+    background-color: #EAE2B7;
+    font-size: 18px;
+    font-weight: bold;
+}
+.confirmButton .okButton{
+    background-color: #D62828;
+    color: white;
+}

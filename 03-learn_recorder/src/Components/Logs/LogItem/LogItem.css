@@ -5,6 +5,9 @@
     margin: 16px 0;
     padding: 6px;
     background-color: #FCBF49;
+    /* 若遮罩层是LogItem组件的子组件，父元素添加relative定位以及z-index层级设计会影响遮罩层覆盖情况-解决办法采用【portal】 */
+    position: relative;
+    z-index: 1;
 }
 
 /* 设置日志内容样式 */
@@ -28,4 +31,17 @@
 /* 设置学习时间 */
 .time{
     color: #D62828;
+}
+
+.delete{
+    margin-right: 10px;
+    color: white;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;/*将鼠标指针在元素上的样式设置为手型，用于指示链接或可点击的元素*/
+    transition: .3s;
+}
+.delete:hover{
+    color: #D62828;
+    transform: rotate(1turn); /*旋转1圈 默认z轴旋转*/
 }
