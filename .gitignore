@@ -8,3 +8,14 @@
 /07-React_basic/node_modules
 /07-React_basic/package-lock.json
 /07-React_basic/package.json
+/13-auto_react_css_fragment/.gitignore
+/13-auto_react_css_fragment/public/favicon.ico
+/13-auto_react_css_fragment/public/robots.txt
+/13-auto_react_css_fragment/package-lock.json
+/13-auto_react_css_fragment/package.json
+/13-auto_react_css_fragment/README.md
+/14-ordering_app/.gitignore
+/14-ordering_app/public/favicon.ico
+/14-ordering_app/public/robots.txt
+/14-ordering_app/package-lock.json
+/14-ordering_app/package.json

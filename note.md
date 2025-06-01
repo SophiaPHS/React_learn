@@ -3,6 +3,7 @@
 - public    供外部直接访问的文件(静态图片、css、js等，无需webpack打包文件，静态目录)
 - index.html(添加标签<div id='root'></div>) 首页模板，且必须要有
 - src 源码目录，放置js源代码
+    - asset 存放静态资源，比如在项目中固定不变的图像
     - App.js
     - index.js 脚本入口文件(webpack以这个入口文件编译关联到index.html)，必须要有
 
@@ -251,6 +252,7 @@ const Logs = ()=>{
         <LogItem date={new Date(2021,5,22,5,30,0)} desc={"学习JS"} time={"40"}/>
     </div>
 }
+> 如果给子组件传递一个`属性且未赋值`，会自动设置为`true`传入子组件中,如`<LogItem isDate/>`
 // 优化1：将传入数据提取到JSX外
 const Logs = ()=>{
     const logsData = [
@@ -615,6 +617,247 @@ const App = ()=>{
 - 功能：依据不同年份显示不同的学习日志
 - 注意：如果涉及删除日志，通过id删除；
 - 功能实现：设计LogFilter组件，一个下拉框选择年份，年份和Logs组件实现双向绑定;年份过滤在Logs中实现
+
+# Create React App(自动创建React项目)
+- 作用：快速创建一个React项目的目录结构，并且会自动安装React中所有依赖(除了react,react-dom,react-scripts,还包括test测试单元，web-vitals网页性能测试)
+- 使用步骤：TERMINAL中进入项目所在目录，执行`npx create-react-app 项目名`命令即可
+## React中css样式
+以下举例是以class设计样式
+- `1.内联样式`
+```js
+// 内联样式示例
+<p style={{color:'red',backgroundColor:'#bfa',border:'blue solid 1px'}}>这是一个段落</p>
+
+{/* 样式过多可以提取出来存储在一个对象中 */}
+const pStyle = {color:'red',backgroundColor:'#bfa',border:'blue solid 1px'}
+
+<p style={pStyle}>段落</p>
+
+// 结合state动态设置样式
+const [redBorder,setRedBorder] = useState(true)
+const clickHandler = ()=>{
+    setRedBorder(!redBorder)
+}
+
+<p style={{border:redBorder?'red solid 1px':'blue solid 1px'}}>段落</p>
+<button onClick={clickHandler}>修改border颜色</button>
+```
+>- 样式用{}包裹而非`""`,并以`{}对象形式写入`，css样式中`-`改成`小驼峰形式`，比如这里`background-color`应写为`backgroundColor`
+>- 不适用于过多/复杂样式，难以维护
+
+- `2.外部样式表`
+    - 使用步骤：
+        1. 创建`xxx.css`文件 
+        2. 通过`import './`引入到组件中
+        3. 通过className绑定样式
+```css
+/* App.css */
+.p1{
+    color:red;
+    background-color:#bfa;
+    border: 1px red solid;
+}
+.blueBorder{
+    border: 1px blue solid;
+}
+```
+```js
+import React, { useState } from 'react'
+import './App.css'
+const App = () => {
+    // 结合state动态设置样式
+    const [redBorder,setRedBorder] = useState(true)
+    const clickHandler = ()=>{
+        setRedBorder(!redBorder)
+    }
+    return (
+        <div>
+            <p className={`p1 ${redBorder?'':'blueBorder'}`}>段落</p>
+            <button onClick={clickHandler}>按钮</button>
+        </div>
+  )
+}
+```
+> - 引入外部样式表属于全局作用域，若存在重复类名容易出现样式冲突
+> - 适用于通用样式，不适用于大范围使用，因为可能存在不同样式表有相同类名使得组件使用该类名造成样式冲突
+
+- `3.CSS Module`
+    - 使用步骤：
+        1. 创建`xxx.module.css` (区别于外部样式表加了.module后缀)
+        2. 在组件中引入css
+            `import classes from './App.module.css'`  (classes--别名)
+        3. 通过classes设置className(以对象属性传值)
+            `className={classes.p1}`  此时设置该属性标签的class为`App_p1__2Rx6u`具有唯一性
+    - 特点：动态设置唯一class值，避免类名重复(不同module，生成的class名不同；相同module，class名一致)
+```css
+/* App.module.css */
+.p1{
+    color:red;
+    background-color: #bfa;
+}
+.Border{
+    border: 1px red solid;
+}
+```
+```js
+import React, { useState } from 'react'
+// 引入CSS moudle需要给该module设置别名
+import classes from './App.module.css'
+const App = () => {
+    // 结合state动态修改样式
+    const [showBorder,setShowBorder]=useState(true)
+    const clickHandler=()=>{
+        setShowBorder(!showBorder)
+    }
+    return (
+        <div>
+            {/* 样式以对象属性设置 */}
+            <p className={`${classes.p1} ${showBorder?classes.Border:''}`}>这是一个段落</p>
+            <button onClick={clickHandler}>按钮</button>
+        </div>
+  )
+}
+
+export default App
+```
+
+## React之Fragment
+- React.Fragment作为父容器的组件，只会将其子元素返回，不会将其本身作为元素显示在页面中中
+```js
+// 问题：react中所有元素要包裹在一个根元素下，但是不想要这个根元素(div)显示在页面中，即产生多余结构
+return <div>
+            <div>...</div>
+            <div>...</div>
+            <div>...</div>
+        </div>
+// 解决方法1 创建一个组件只返回其子元素
+import React from 'react'
+
+const Out = (props) => {
+  return props.children
+}
+
+export default Out
+// App组件中返回值
+return <Out>
+            <div>...</div>
+            <div>...</div>
+        </Out>
+
+// 解决方法2 使用React.Fragment实现
+import React from 'react'
+
+return <React.Fragment>
+            <div>...</div>
+        </React.Fragment>
+
+// 等价于
+import {Fragment} from 'react'
+return <Fragment>
+            <div>...</div>
+        </Fragment>
+// 等价于 语法糖
+return <>
+            <div>...</div>
+        </>
+```
+
+# 订餐App
+- 项目整体架构<br/>
+                       订餐App<br/>
+            搜索框      食物列表            购物车 <br/>
+                         食物       购物详情         结账页    <br/>
+                        数量按钮    购车车列表   购物清单 支付按钮 <br/>
+                                                购物项目
+- 目录结构：图片暂置在`public/img/meals`(不建议，因为访问量过大会增加服务器性能负担，像这种外部资源一般放置在cdn服务器/对象存储中)，访问图片无需写public,直接`/img/meals/xxx.png`
+
+- 功能设计难点：添加商品后，商品购物车展示(点击底部购物车)与隐藏(分别点击商品`-`直至商品数量为0或者点击遮罩层`Backdrop`或者底部购物车)
+           清空购物车弹窗的取消(直接点击弹窗取消按钮或外部遮罩层)与确认功能,当点击确认`Meals.js`中商品数量也应实时改为0，需要在App.js中添加 clearCart方法修改cart-context中数据
+           - 问题及解决：购物车详情和弹窗遮罩层覆盖面不同涉及z-index,弹窗隐藏的点击事件涉及到购物车详情隐藏需要阻止冒泡
+
+## App容器适配
+- 不同移动端宽度是不一致的，为了适应任何移动端可以采取以下操作
+```js
+// index.js
+// 除以几视口宽度就是多少rem，设置视口总宽度为750rem即占满整个视口 px->rem, 实现不同窗口大小的动态适配
+document.documentElement.style.fontSize =100/750+'vw'
+
+// App.js
+return (
+        <div style={{width:'750rem',height:200,backgroundColor:'#fba'}}>
+        </div>
+  )
+```
+> `问题`：在设置移动端大小适配时字体变小了是因为继承了Html设置的字体大小---通过在index.css中body设置font-size去覆盖
+
+- 切换不同尺寸时`字体大小适配`：将`font-size`的单位有`px->rem`
+
+## React之Context
+- 背景：A组件传递数据给C组件，通过A→B→C，但B不需要使用该数据只是作为一个桥梁，没有必要通过B传递，所以引入context
+- 作用：实现不同组件间的数据共享和交互，一个公共存储空间，类似于全局作用域，不再是基于props自上向下(父→子)逐层传递数据
+- 使用步骤：
+    1. 创建context--`React.createContext()`，参数(默认值，虽然不用可为空,但建议写数据结构)---多组件访问的数据，存放公共数据
+    2. 在使用公共数据的组件中引入Context,
+        - 方法1：通过`<Context.Consumer>`组件创建jsx元素，里面需要写一个回调函数，`传入的参数即存储在context中的数据`，在回调函数中即可访问context中存储的数据
+        - 方法2：使用`useContext()`,参数为Context，`只适用于函数组件`
+```js
+// ContextTest.js  --定义并存储公共数据
+import React from 'react'
+const ContextTest = React.createContext({
+    name:'张三',
+    age:18
+})
+export default ContextTest
+
+// Test.js 使用/消费公共数据
+// 使用方式1：ContextTest.Consumer
+// 1.引入context
+import ContextTest from '../../ContextTest'
+const TestOne = ()=>{
+    return (
+        {/**2.通过ContextTest.Consumer组件中回调函数的参数访问context的数据 */}
+        <ContextTest.Consumer>
+            {
+                (ct)=>{
+                    return <div>{ct.name}--{ct.age}</div>
+                }
+            }
+        </ContextTest.Consumer>
+    )
+}
+// 使用方法2：钩子函数useContext(),参数为Context，获取其中数据作为返回值
+// 1.引入context
+import ContextTest from '../../ContextTest'
+const TestTwo = ()=>{
+    // 使用钩子函数获取context
+    const ctx = useContext(ContextTest)
+    return (
+         <div>
+            {ct.name}--{ct.age}
+         </div>
+    )
+}
+```
+> `注意`:一般不会在context中指定数据，这和创建一个普通js文件并存放数据，其他组件引入没什么区别，所以有个`<Context.Provider>`组件
+- Context.Provider组件:数据生产者，通过value指定Context中存储的数据，在该组件中所有子组件都可通过Context访问其指定的数据
+    - 一般传入的数据为useState，可以实现动态修改、渲染
+```js
+import ContextTest from '../../ContextTest'
+const App = ()=>{
+    return (
+         <div>
+            <TestOne/> {/**结果为ContextTest中数据name:'张三',age:18 */}
+            <TestContext.Provider value={{name:'王五',age:20}}>
+                <TestTwo/>{/**结果为TestContext.Provider的value值 name:'王五',age:20 */}
+                <TestContext.Provider value={{name:'李四',age:26}}>
+                    <TestThree/>{/**结果为TestContext.Provider的value值 name:'李四',age:26 */}
+                </TestContext.Provider>
+            </TestContext.Provider>
+         </div>
+    )
+}
+```
+> 若`Context.Provider组件嵌套`，通过Context访问数据服从`就近原则`，比如示例中的TestThree组件结果，如果`没有Provider读取context的默认数据(初始化设置)`
 
 
 

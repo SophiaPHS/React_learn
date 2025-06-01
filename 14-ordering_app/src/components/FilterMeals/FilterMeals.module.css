@@ -1,0 +1,35 @@
+.FilterMeals{
+    /* 将搜索框固定在顶部，设置z-index使其不会被覆盖 */
+    display:flex;
+    position: fixed;
+    align-items: center;
+    justify-content: center;
+    left: 0;
+    right: 0;
+    height: 120rem;
+    z-index: 999;
+    border-bottom: 1px solid #f2f2f2;
+}
+.InputOuter{
+    /* 搜索框开启相对定位，作为搜索图标的定位参照物 */
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+.SearchInput{
+    width:650rem;
+    height: 70rem;
+    border: none;
+    border-radius: 16px;
+    background-color: #f2f2f2;
+    padding-left: 60rem;
+    outline: none;
+    font-size: 32rem;
+}
+.SearchIcon{
+    position: absolute;
+    left: 10rem;
+    color: #aaa;
+    /* font-size: 20px; */
+     font-size: 40rem;
+}
