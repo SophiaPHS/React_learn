@@ -1,0 +1,8 @@
+/* 将滚动条设置给Meals的样式设计，令其到顶部和底部距离为0，且溢出内容也包裹(overflow:auto) */
+.Meals{
+    position: absolute;
+    top:120rem;
+    bottom: 0;
+    overflow: auto;
+    padding-bottom: 120rem;
+}

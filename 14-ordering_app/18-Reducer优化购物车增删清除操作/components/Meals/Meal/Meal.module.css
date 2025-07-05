@@ -1,0 +1,52 @@
+.Meal{
+    /* 开启弹性盒子 */
+    display: flex;
+    /* 设置辅轴对齐方式 */
+    align-items: center;
+    /* 设置外边距 */
+    padding:30rem 20rem;
+    border-bottom: 1px #f2f2f2 solid;
+}
+.ImgBox{
+    width: 280rem;
+}
+
+img{
+    width: 100%;
+}
+
+.Title{
+    font-weight: normal;
+    /* font-size: 18px; */
+    font-size: 36rem;
+    margin: 0;
+}
+
+.Desc{
+    margin: 0;
+    width: 98%;
+    color: #bbb;
+    font-size: 24rem;
+    padding-right: 40rem;
+}
+
+.PriceWrap{
+    display: flex;
+    justify-content: space-between;
+    margin-top: 30rem;
+    padding-right: 40rem;
+}
+.Price{
+    font-weight: bold;
+    /* font-size: 18px; */
+    font-size: 36rem; 
+}
+.Price::before{
+    content: '￥';
+    /* font-size: 12px; */
+    font-size: 24rem;
+}
+.DescBox{
+    /* 当没有Desc时，DescBox区域无法撑开，通过flex:auto自动撑开内容 */
+    flex:auto
+}

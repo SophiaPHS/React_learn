@@ -1,0 +1,40 @@
+.CartDetails{
+    position: absolute;
+    /* 设置布局为垂直，不然购物车详情列表设置滚动无效 */
+    display: flex;
+    flex-flow: column;
+    width: 750rem;
+    background-color: #fff;
+    bottom: 0;
+    /* 避免商品数量过多覆盖整个页面设置最大高度 */
+    max-height:750rem;
+    padding-bottom: 120rem;
+    border-top-left-radius: 20rem;
+    border-top-right-radius: 20rem;
+}
+
+.Header{
+    display: flex;
+    justify-content: space-between;
+    padding: 20rem;
+    align-items: center;
+    margin: 0;
+    
+}
+
+.Title{
+    font-weight: bold;
+    margin: 0;
+    font-size: 28rem;
+}
+.Clear{
+    color: grey;
+    font-size: 20rem;
+}
+.Clear span{
+    margin-left: 10rem;
+}
+.MealList{
+    /* 实现购物车详情的滚动,避免内容过多溢出看不到 */
+    overflow: auto;
+}
