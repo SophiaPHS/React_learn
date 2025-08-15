@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redux</title>
+</head>
+<body>
+    <div>
+        <button id="sub">减少</button>
+        <span id="countSpan">1</span>
+        <span id="name">张三</span>
+        <button id="add">增加</button>
+        <button id="addN">增加N</button>
+    </div>
+    <script src="https://unpkg.com/redux@4.2.0/dist/redux.js"></script>
+    <script>
+        const subBtn = document.getElementById('sub')
+        const addBtn = document.getElementById('add')
+        const addNBtn = document.getElementById('addN')
+        const countSpan = document.getElementById('countSpan')
+        const name = document.getElementById('name')
+        function reducer(state={count:1,name:'张三'},action){
+            /* 
+                state---当前state，通常是一个对象，因为管理多个state数据；可以根据此state生成新的state
+                action--是一个js对象，保存操作信息
+                    - type表示操作的类型
+                    - 其他需要传递的参数也可以在action中设置
+            */
+           switch (action.type){//所有操作在这里定义好，可预测
+                case 'ADD':
+                    // 当仅修改其中一个state，其他先解构赋值再修改其中的state，否则其他没有修改会丢失
+                    console.log('ADD')
+                    return {...state,count:state.count+1};
+                case 'SUB':
+                    return {...state,count:state.count-1};
+                case 'ADDN':
+                    console.log('ADDN')
+                    console.log(state.count,action.payload)
+                    return {...state,count:state.count+action.payload};
+                default:
+                    return state;
+           }
+        }
+        // 第一个参数是要执行的函数，第二个参数是初始值
+        const store = Redux.createStore(reducer)//一定要有初始值，这里不设置也可以在reducer(state=1,action)中默认指定
+        store.subscribe(()=>{//当state发生变化触发此回调函数，即将state和组件UI进行绑定
+            // 打印state的值
+            // console.log(store.getState())
+            // 当有多个state，getState()是获取所有的state
+            console.log(store.getState().count)
+            countSpan.innerText=store.getState().count
+            name.innerText=store.getState().name
+        })
+        let count = 1
+        subBtn.addEventListener('click',()=>{
+            // count--;
+            // countSpan.innerText = count
+            store.dispatch({type:'SUB'})
+        }) 
+        addBtn.addEventListener('click',()=>{
+            // count++;
+            // countSpan.innerText = count
+            store.dispatch({type:'ADD'})
+        })
+        addNBtn.addEventListener('click',()=>{
+            store.dispatch({type:'ADDN',payload:5})
+        })
+    </script>
+</body>
+</html>

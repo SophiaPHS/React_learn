@@ -19,3 +19,14 @@
 /14-ordering_app/public/robots.txt
 /14-ordering_app/package-lock.json
 /14-ordering_app/package.json
+/server
+/27-router-v5/.gitignore
+/28-router-v6/node_modules
+/28-router-v6/package-lock.json
+/28-router-v6/package.json
+/29-auth_case/node_modules
+/29-auth_case/package-lock.json
+/29-auth_case/package.json
+/30-react_echarts/.gitignore
+/30-react_echarts/.package-lock.json
+/30-react_echarts/.package-lock.json
