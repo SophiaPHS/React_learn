@@ -1,13 +1,13 @@
 ## 项目描述
-对Ant Design的带搜索的Input和Table组件进行二次封装，实现自定义列表的“作用域插槽”
+对`Ant Design`的`带搜索的Input`和`Table`组件进行二次封装，实现自定义列表的“作用域插槽”
 ## 组件功能描述
-- MyInputTable：带搜索功能的数据表格组件
+- `MyInputTable`：带搜索功能的数据表格组件
     - 支持搜索输入、清空和聚焦操作
-        - 使用useState实现原始数据(msg)和过滤数据(filterData)的动态响应
+        - 使用`useState`实现原始数据(msg)和过滤数据(filterData)的动态响应
         - 输入框值的联动(Input的onChange操作setMsg方法)
-        - 清空状态包括按钮和输入操作：前者通过传来的回调函数执行setMsg，后者使用useEffect基于msg进行数据过滤
+        - 清空状态包括按钮和输入操作：前者通过传来的回调函数执行setMsg，后者使用`useEffect`基于msg进行数据过滤
         - 通过`...rest`透传数据和方法给UI组件
-        - 使用useRef存放，ref传参，forwardRef指定，useImperativeHandle暴露Ant的Input组件的聚焦方法
-    - 根据搜索内容过滤表格数据(useCallback缓存onSearch方法过滤数据)
-- MyList：自定义列表组件
-    - 通过render(children)函数自定义列表项展示内容
+        - 使用`useRef`存放，`ref`传参，`forwardRef`指定，`useImperativeHandle`暴露Ant的Input组件的聚焦方法
+    - 根据搜索内容过滤表格数据(`useCallback`缓存onSearch方法过滤数据)
+- `MyList`：自定义列表组件
+    - 通过`render/children`函数自定义列表项展示内容
