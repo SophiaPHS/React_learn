@@ -1,0 +1,12 @@
+/* react引用适配命名基于css配置， 小驼峰/[flex-center] */
+.flexCenter{
+    display: flex;
+    align-items: center;
+    /* justify-content:center; */
+}
+.mr8{
+    margin-right: 8px;
+}
+.ml8{
+    margin-left: 8px;
+}
